@@ -3,6 +3,7 @@ package ru.mastkey.fj_2024.list;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class CustomLinkedList<E> implements Iterable<E> {
     private final Node<E> head;
@@ -38,21 +39,12 @@ public class CustomLinkedList<E> implements Iterable<E> {
 
     public boolean contains(E e) {
         var temp = head.next;
-        if (e == null) {
             while (temp != tail) {
-                if (temp.item == e) {
+                if (Objects.equals(temp.item, e)) {
                     return true;
                 }
                 temp = temp.next;
             }
-        } else {
-            while (temp != tail) {
-                if (e.equals(temp.item)) {
-                    return true;
-                }
-                temp = temp.next;
-            }
-        }
         return false;
     }
 
