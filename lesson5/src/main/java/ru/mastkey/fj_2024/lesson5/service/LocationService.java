@@ -61,7 +61,8 @@ public class LocationService {
     }
 
     public void deleteLocationById(UUID id) {
-        locationRepository.deleteById(id);
+        var location = findLocationWithValidation(id);
+        locationRepository.deleteById(location.getId());
     }
 
     public LocationResponse updateLocation(UUID id, LocationRequest request) {

@@ -61,7 +61,8 @@ public class CategoryService {
     }
 
     public void deleteCategoryById(UUID id) {
-        categoryRepository.deleteById(id);
+        var category = findCategoryWithValidation(id);
+        categoryRepository.deleteById(category.getId());
     }
 
     public CategoryResponse updateCategory(UUID id, CategoryRequest request) {
