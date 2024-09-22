@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.mastkey.fj_2024.lesson5.controller.dto.LocationRequest;
 import ru.mastkey.fj_2024.lesson5.controller.dto.LocationResponse;
 import ru.mastkey.fj_2024.lesson5.service.LocationService;
+import ru.mastkey.ripperstarter.annotation.ExecutionTime;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/places/locations")
 @RequiredArgsConstructor
+@ExecutionTime
 public class LocationController implements BaseController<LocationRequest, LocationResponse> {
 
     private final LocationService locationService;

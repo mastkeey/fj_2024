@@ -1,7 +1,7 @@
 package ru.mastkey.fj_2024.lesson5.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import ru.mastkey.fj_2024.lesson5.client.ApiClient;
@@ -13,10 +13,13 @@ import ru.mastkey.fj_2024.lesson5.exception.ErrorType;
 import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 import ru.mastkey.fj_2024.lesson5.mapper.CategoryRequestToCategoryMapper;
 import ru.mastkey.fj_2024.lesson5.repository.EntityRepository;
+import ru.mastkey.ripperstarter.annotation.ExecutionTime;
+import ru.mastkey.ripperstarter.annotation.PostProxyPostConstruct;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
@@ -26,14 +29,16 @@ public class CategoryService {
     private final ConversionService conversionService;
     private final CategoryRequestToCategoryMapper categoryRequestToCategoryMapper;
 
-    @PostConstruct
+    @ExecutionTime
+    @PostProxyPostConstruct
     public void init() {
+        log.info("category init start");
         var kudaGoCategoryResponses = client.getAllEntitiesFromKudaGo();
         var categories = kudaGoCategoryResponses.stream()
                 .map(res -> conversionService.convert(res, Category.class))
                 .toList();
         categoryRepository.saveAll(categories);
-        System.out.println(categories.size());
+        log.info("category init end");
     }
 
     public CategoryResponse getCategoryById(UUID uuid) {

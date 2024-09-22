@@ -9,7 +9,8 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.mastkey.fj_2024.lesson5.client.dto.KudaGoLocationResponse;
-import ru.mastkey.fj_2024.lesson5.entity.Location;
+import ru.mastkey.fj_2024.lesson5.exception.ErrorType;
+import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LocationClient implements ApiClient<KudaGoLocationResponse> {
 
+    private static final String MSG_CLIENT_ERROR = "Error with kudago api request '%s'";
     private final HttpClient httpClient;
-
     private final ObjectMapper objectMapper;
 
     @Value("${kudago.location-url}")
@@ -34,7 +35,7 @@ public class LocationClient implements ApiClient<KudaGoLocationResponse> {
             return objectMapper.readValue(jsonResponse, new TypeReference<List<KudaGoLocationResponse>>() {
             });
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ServiceException(ErrorType.INTERNAL_SERVER_ERROR, MSG_CLIENT_ERROR, e);
         }
     }
 }

@@ -1,7 +1,7 @@
 package ru.mastkey.fj_2024.lesson5.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import ru.mastkey.fj_2024.lesson5.client.ApiClient;
@@ -13,10 +13,13 @@ import ru.mastkey.fj_2024.lesson5.exception.ErrorType;
 import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 import ru.mastkey.fj_2024.lesson5.mapper.LocationRequestToLocationMapper;
 import ru.mastkey.fj_2024.lesson5.repository.EntityRepository;
+import ru.mastkey.ripperstarter.annotation.ExecutionTime;
+import ru.mastkey.ripperstarter.annotation.PostProxyPostConstruct;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LocationService {
@@ -26,14 +29,16 @@ public class LocationService {
     private final ConversionService conversionService;
     private final LocationRequestToLocationMapper locationRequestToLocationMapper;
 
-    @PostConstruct
+    @ExecutionTime
+    @PostProxyPostConstruct
     public void init() {
+        log.info("location init start");
         var kudaGoLocationResponses = client.getAllEntitiesFromKudaGo();
         var locations = kudaGoLocationResponses.stream()
                 .map(res -> conversionService.convert(res, Location.class))
                 .toList();
         locationRepository.saveAll(locations);
-        System.out.println(locations.size());
+        log.info("location init end");
     }
 
     public LocationResponse getLocationById(UUID uuid) {

@@ -9,7 +9,8 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.mastkey.fj_2024.lesson5.client.dto.KudaGoCategoryResponse;
-import ru.mastkey.fj_2024.lesson5.entity.Category;
+import ru.mastkey.fj_2024.lesson5.exception.ErrorType;
+import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryClient implements ApiClient<KudaGoCategoryResponse> {
 
+    private static final String MSG_CLIENT_ERROR = "Error with kudago api request '%s'";
     private final HttpClient httpClient;
-
     private final ObjectMapper objectMapper;
 
     @Value("${kudago.category-url}")
@@ -34,7 +35,7 @@ public class CategoryClient implements ApiClient<KudaGoCategoryResponse> {
             return objectMapper.readValue(jsonResponse, new TypeReference<List<KudaGoCategoryResponse>>() {
             });
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ServiceException(ErrorType.INTERNAL_SERVER_ERROR, MSG_CLIENT_ERROR, e);
         }
     }
 }
