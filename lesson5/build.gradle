@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.0.0'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
 }
 
 java {
@@ -32,12 +33,47 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
 
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.0'
+    testImplementation 'org.wiremock.integrations.testcontainers:wiremock-testcontainers-module:1.0-alpha-13'
+
+    testImplementation 'org.mockito:mockito-core:5.5.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.jeasy:easy-random-core:5.0.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required.set(true)
+    }
+}
+
+tasks.test {
+    finalizedBy tasks.jacocoTestCoverageVerification
+}
+
+jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "ru/mastkey/fj_2024/lesson5/client/dto/*",
+                    "ru/mastkey/fj_2024/lesson5/controller/dto/*",
+                    "ru/mastkey/fj_2024/lesson5/entity/*",
+                    "ru/mastkey/fj_2024/lesson5/exception/*",
+                    "**/*MapperImpl.class"
+            ])
+        }))
+    }
+
 }

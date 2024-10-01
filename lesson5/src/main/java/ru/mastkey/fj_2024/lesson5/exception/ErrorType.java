@@ -1,7 +1,5 @@
 package ru.mastkey.fj_2024.lesson5.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
