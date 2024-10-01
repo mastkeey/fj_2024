@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/scripts/XML_daily.asp"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "currency.xml",
+    "headers": {
+      "Content-Type": "application/xml"
+    }
+  }
+}
