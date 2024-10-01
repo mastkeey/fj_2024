@@ -4,7 +4,6 @@ import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -16,6 +15,7 @@ import ru.mastkey.fj_2024.lesson5.entity.Category;
 import ru.mastkey.fj_2024.lesson5.entity.Location;
 import ru.mastkey.fj_2024.lesson5.repository.EntityRepository;
 
+import java.io.File;
 import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,16 +25,12 @@ public class IntegrationTestBase {
 
     protected static final EasyRandom easyRandom = new EasyRandom();
 
-    @LocalServerPort
-    private int port;
-
     @Container
     private static final WireMockContainer wiremockServer = new WireMockContainer("wiremock/wiremock:2.35.0")
             .withMappingFromResource("wiremock/categories.json")
-            .withMappingFromResource("wiremock/locations.json");
-
-
-    private String wireMockUrl;
+            .withMappingFromResource("wiremock/locations.json")
+            .withFile(new File("src/test/resources/__files/currency.xml"))
+            .withMappingFromResource("wiremock/currency.json");
 
     @DynamicPropertySource
     static void overrideKudaGoProperties(DynamicPropertyRegistry registry) {
@@ -43,6 +39,7 @@ public class IntegrationTestBase {
                 wiremockServer.getMappedPort(8080));
         registry.add("kudago.category-url", () -> wireMockUrl + "/public-api/v1.4/place-categories");
         registry.add("kudago.location-url", () -> wireMockUrl + "/public-api/v1.4/locations");
+        registry.add("cb.currency-url", () -> wireMockUrl + "/scripts/XML_daily.asp");
     }
 
     @Autowired
