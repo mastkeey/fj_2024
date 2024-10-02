@@ -63,6 +63,25 @@ tasks.test {
     finalizedBy tasks.jacocoTestCoverageVerification
 }
 
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.70
+            }
+            classDirectories.setFrom(files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                        "ru/mastkey/fj_2024/lesson5/client/dto/*",
+                        "ru/mastkey/fj_2024/lesson5/controller/dto/*",
+                        "ru/mastkey/fj_2024/lesson5/entity/*",
+                        "ru/mastkey/fj_2024/lesson5/exception/*",
+                        "**/*MapperImpl.class"
+                ])
+            }))
+        }
+    }
+}
+
 jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
