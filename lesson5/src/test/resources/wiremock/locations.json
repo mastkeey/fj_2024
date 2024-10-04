@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/public-api/v1.4/locations"
+  },
+  "response": {
+    "status": 200,
+    "body": "[{\"name\":\"Test\", \"slug\":\"Test\"}]",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
