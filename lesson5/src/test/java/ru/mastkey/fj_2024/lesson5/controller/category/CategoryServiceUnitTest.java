@@ -1,4 +1,4 @@
-package ru.mastkey.fj_2024.lesson5.controller;
+package ru.mastkey.fj_2024.lesson5.controller.category;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
