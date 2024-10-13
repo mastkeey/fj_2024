@@ -1,6 +1,23 @@
 spring:
   application:
     name: lesson5
+  cache:
+    type: caffeine
+server:
+  port: 8011
+cb:
+  currency-url: https://www.cbr.ru/scripts/XML_daily.asp
+  currency-cache-name: currenciesCache
 kudago:
   category-url: https://kudago.com/public-api/v1.4/place-categories
   location-url: https://kudago.com/public-api/v1.4/locations
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      default:
+        registerHealthIndicator: true
+        failure-rate-threshold: 50
+        sliding-window-size: 10
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3

@@ -1,10 +1,10 @@
-package ru.mastkey.fj_2024.lesson5.controller;
+package ru.mastkey.fj_2024.lesson5.controller.category;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import ru.mastkey.fj_2024.lesson5.controller.dto.LocationRequest;
-import ru.mastkey.fj_2024.lesson5.controller.dto.LocationResponse;
-import ru.mastkey.fj_2024.lesson5.entity.Location;
+import ru.mastkey.fj_2024.lesson5.controller.dto.CategoryRequest;
+import ru.mastkey.fj_2024.lesson5.controller.dto.CategoryResponse;
+import ru.mastkey.fj_2024.lesson5.entity.Category;
 import ru.mastkey.fj_2024.lesson5.suport.IntegrationTestBase;
 
 import java.util.List;
@@ -12,30 +12,31 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class LocationControllerTest extends IntegrationTestBase {
-    private final String PATH = "/api/v1/places/locations";
+class CategoryControllerTest extends IntegrationTestBase {
+
+    private final String PATH = "/api/v1/places/categories";
 
     @Test
-    void getLocationByIdTest() {
-        var location = easyRandom.nextObject(Location.class);
-        locationRepository.save(location);
+    void getCategoryByIdTest() {
+        var category = easyRandom.nextObject(Category.class);
+        categoryRepository.save(category);
 
-        var expectedResponse = conversionService.convert(location, LocationResponse.class);
+        var expectedResponse = conversionService.convert(category, CategoryResponse.class);
 
         var response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(PATH + "/{id}")
-                        .build(location.getId()))
+                        .build(category.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(LocationResponse.class)
+                .expectBody(CategoryResponse.class)
                 .returnResult();
 
         assertThat(response.getResponseBody()).usingRecursiveComparison().isEqualTo(expectedResponse);
     }
 
     @Test
-    void getLocationByIdTestNotFound() {
+    void getCategoryByIdTestNotFound() {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(PATH + "/{id}")
@@ -45,9 +46,9 @@ class LocationControllerTest extends IntegrationTestBase {
     }
 
     @Test
-    void getAllLocationTest() {
+    void getAllCategoriesTest() {
 
-        var expectedSize = locationRepository.findAll().size();
+        var expectedSize = categoryRepository.findAll().size();
 
         var response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -62,42 +63,42 @@ class LocationControllerTest extends IntegrationTestBase {
     }
 
     @Test
-    void createLocationTest() {
-        var location = easyRandom.nextObject(LocationRequest.class);
+    void createCategoryTest() {
+        var category = easyRandom.nextObject(CategoryRequest.class);
 
-        var expectedSize = locationRepository.findAll().size();
+        var expectedSize = categoryRepository.findAll().size();
 
         var response = webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(PATH)
                         .build())
-                .bodyValue(location)
+                .bodyValue(category)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(LocationResponse.class)
+                .expectBody(CategoryResponse.class)
                 .returnResult();
 
-        assertThat(locationRepository.findAll().size()).isEqualTo(expectedSize + 1);
-        assertThat(response.getResponseBody().getName()).isEqualTo(location.getName());
-        assertThat(response.getResponseBody().getSlug()).isEqualTo(location.getSlug());
+        assertThat(categoryRepository.findAll().size()).isEqualTo(expectedSize + 1);
+        assertThat(response.getResponseBody().getName()).isEqualTo(category.getName());
+        assertThat(response.getResponseBody().getSlug()).isEqualTo(category.getSlug());
     }
 
     @Test
-    void updateLocationTest() {
-        var location = easyRandom.nextObject(Location.class);
-        locationRepository.save(location);
-        var requestForUpdate = new LocationRequest();
+    void updateCategoryTest() {
+        var category = easyRandom.nextObject(Category.class);
+        categoryRepository.save(category);
+        var requestForUpdate = new CategoryRequest();
         requestForUpdate.setName("update");
         requestForUpdate.setSlug("update");
 
         var response = webClient.put()
                 .uri(uriBuilder -> uriBuilder
                         .path(PATH + "/{id}")
-                        .build(location.getId()))
+                        .build(category.getId()))
                 .bodyValue(requestForUpdate)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(LocationResponse.class)
+                .expectBody(CategoryResponse.class)
                 .returnResult();
 
         assertThat(response.getResponseBody().getName()).isEqualTo(requestForUpdate.getName());
@@ -106,21 +107,22 @@ class LocationControllerTest extends IntegrationTestBase {
 
     @Test
     void deleteCategoryTest() {
-        var location = easyRandom.nextObject(Location.class);
-        locationRepository.save(location);
+        var category = easyRandom.nextObject(Category.class);
+        categoryRepository.save(category);
 
         webClient.delete()
                 .uri(uriBuilder -> uriBuilder
                         .path(PATH + "/{id}")
-                        .build(location.getId()))
+                        .build(category.getId()))
                 .exchange()
                 .expectStatus().isOk();
 
-        assertThat(locationRepository.findById(location.getId())).isEmpty();
+        assertThat(categoryRepository.findById(category.getId())).isEmpty();
     }
 
     @AfterEach
     void cleanUp() {
-        locationRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
+
 }
