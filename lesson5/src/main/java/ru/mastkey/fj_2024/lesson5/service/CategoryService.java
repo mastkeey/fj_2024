@@ -1,6 +1,7 @@
 package ru.mastkey.fj_2024.lesson5.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,11 @@ import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 import ru.mastkey.fj_2024.lesson5.mapper.CategoryRequestToCategoryMapper;
 import ru.mastkey.fj_2024.lesson5.repository.EntityRepository;
 import ru.mastkey.ripperstarter.annotation.ExecutionTime;
-import ru.mastkey.ripperstarter.annotation.PostProxyPostConstruct;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
@@ -28,17 +30,22 @@ public class CategoryService {
     private final ApiClient<KudaGoCategoryResponse> client;
     private final ConversionService conversionService;
     private final CategoryRequestToCategoryMapper categoryRequestToCategoryMapper;
+    private final ExecutorService fixedThreadPool;
 
     @ExecutionTime
-    @PostProxyPostConstruct
-    public void init() {
-        log.info("category init start");
-        var kudaGoCategoryResponses = client.getAllEntitiesFromKudaGo();
-        var categories = kudaGoCategoryResponses.stream()
-                .map(res -> conversionService.convert(res, Category.class))
-                .toList();
-        categoryRepository.saveAll(categories);
-        log.info("category init end");
+    public Future<Void> init() {
+        return fixedThreadPool.submit(() -> {
+            log.info("category init start");
+            categoryRepository.deleteAll();
+            var kudaGoCategoryResponses = client.getAllEntitiesFromKudaGo();
+            var categories = kudaGoCategoryResponses.stream()
+                    .map(res -> conversionService.convert(res, Category.class))
+                    .toList();
+            categoryRepository.saveAll(categories);
+
+            log.info("category init end");
+            return null;
+        });
     }
 
     public CategoryResponse getCategoryById(UUID uuid) {
