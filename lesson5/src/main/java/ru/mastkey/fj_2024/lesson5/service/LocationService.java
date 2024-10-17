@@ -14,10 +14,11 @@ import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 import ru.mastkey.fj_2024.lesson5.mapper.LocationRequestToLocationMapper;
 import ru.mastkey.fj_2024.lesson5.repository.EntityRepository;
 import ru.mastkey.ripperstarter.annotation.ExecutionTime;
-import ru.mastkey.ripperstarter.annotation.PostProxyPostConstruct;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
@@ -28,17 +29,21 @@ public class LocationService {
     private final ApiClient<KudaGoLocationResponse> client;
     private final ConversionService conversionService;
     private final LocationRequestToLocationMapper locationRequestToLocationMapper;
+    private final ExecutorService fixedThreadPool;
 
     @ExecutionTime
-    @PostProxyPostConstruct
-    public void init() {
-        log.info("location init start");
-        var kudaGoLocationResponses = client.getAllEntitiesFromKudaGo();
-        var locations = kudaGoLocationResponses.stream()
-                .map(res -> conversionService.convert(res, Location.class))
-                .toList();
-        locationRepository.saveAll(locations);
-        log.info("location init end");
+    public Future<Void> init() {
+        return fixedThreadPool.submit(() -> {
+            log.info("location init start");
+            locationRepository.deleteAll();
+            var kudaGoLocationResponses = client.getAllEntitiesFromKudaGo();
+            var locations = kudaGoLocationResponses.stream()
+                    .map(res -> conversionService.convert(res, Location.class))
+                    .toList();
+            locationRepository.saveAll(locations);
+            log.info("location init end");
+            return null;
+        });
     }
 
     public LocationResponse getLocationById(UUID uuid) {

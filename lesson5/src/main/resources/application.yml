@@ -11,6 +11,7 @@ cb:
 kudago:
   category-url: https://kudago.com/public-api/v1.4/place-categories
   location-url: https://kudago.com/public-api/v1.4/locations
+  events-url: https://kudago.com/public-api/v1.4/events
 
 resilience4j:
   circuitbreaker:
@@ -21,3 +22,14 @@ resilience4j:
         sliding-window-size: 10
         wait-duration-in-open-state: 10s
         permitted-number-of-calls-in-half-open-state: 3
+
+app:
+  threadpool:
+    size: 2
+  scheduled:
+    threadpool:
+      size: 2
+  init:
+    schedule: "PT10M"
+  rate-limit:
+    max-concurrent-requests: 5
