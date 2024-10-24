@@ -23,7 +23,10 @@ import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -199,5 +202,69 @@ class EventClientTest {
         assertEquals(ErrorType.INTERNAL_SERVER_ERROR.getCode(), exception.getCode());
 
         verify(rateLimiter).acquire();
+    }
+
+    @Test
+    void getEvents_ShouldThrowServiceException_WhenRateLimiterIsExhausted() throws Exception {
+        doThrow(new InterruptedException("Rate limiter exhausted")).when(rateLimiter).acquire();
+
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            eventClient.getEvents(LocalDate.now(), LocalDate.now());
+        });
+
+        assertEquals(ErrorType.INTERNAL_SERVER_ERROR.getCode(), exception.getCode());
+
+        verify(rateLimiter, times(1)).acquire();
+        verify(rateLimiter, times(0)).release();
+    }
+
+    @Test
+    void getEvents_ShouldRespectRateLimitWithMultipleThreads() throws Exception {
+        String jsonResponse = "{ \"results\": ["
+                + "{ \"is_free\": true, \"title\": \"Event 1\", \"price\": \"500\" },"
+                + "{ \"is_free\": false, \"title\": \"Event 2\", \"price\": \"1500\" }"
+                + "] }";
+
+        List<KudaGoEventsResponse> expectedResponse = List.of(
+                new KudaGoEventsResponse(true, "Event 1", "500"),
+                new KudaGoEventsResponse(false, "Event 2", "1500")
+        );
+
+        Semaphore semaphoreSpy = spy(new Semaphore(2));
+        eventClient.rateLimiter = semaphoreSpy;
+
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+        when(httpResponse.getEntity()).thenReturn(entity);
+        entityUtilsMockedStatic.when(() -> EntityUtils.toString(entity, "UTF-8")).thenReturn(jsonResponse);
+
+        JsonNode rootNode = mock(JsonNode.class);
+        JsonNode resultsNode = mock(JsonNode.class);
+        when(objectMapper.readTree(jsonResponse)).thenReturn(rootNode);
+        when(rootNode.get("results")).thenReturn(resultsNode);
+
+        ObjectReader objectReader = mock(ObjectReader.class);
+        when(objectMapper.readerForListOf(KudaGoEventsResponse.class)).thenReturn(objectReader);
+        when(objectReader.readValue(resultsNode)).thenReturn(expectedResponse);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        for (int i = 0; i < 4; i++) {
+            executorService.submit(() -> {
+                try {
+                    eventClient.getEvents(LocalDate.now(), LocalDate.now());
+                } catch (ServiceException e) {
+                    fail("Unexpected exception: " + e.getMessage());
+                }
+            });
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(10, TimeUnit.SECONDS);
+
+        verify(httpClient, times(4)).execute(any(HttpGet.class));
+        verify(semaphoreSpy, times(4)).acquire();
+        verify(semaphoreSpy, times(4)).release();
     }
 }

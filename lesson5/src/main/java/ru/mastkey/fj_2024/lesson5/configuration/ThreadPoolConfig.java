@@ -17,11 +17,23 @@ public class ThreadPoolConfig {
     @Value("${app.scheduled.threadpool.size}")
     private int scheduledThreadPoolSize;
 
+    @Value("${app.event-service.threadpool.size}")
+    private int eventServiceThreadPoolSize;
+
     @Bean(name = "fixedThreadPool")
     public ExecutorService fixedThreadPool() {
         return Executors.newFixedThreadPool(threadPoolSize, runnable -> {
             Thread thread = new Thread(runnable);
             thread.setName("FixedThreadPool-Worker");
+            return thread;
+        });
+    }
+
+    @Bean(name = "eventServiceThreadPool")
+    public ExecutorService eventServiceThreadPool() {
+        return Executors.newFixedThreadPool(eventServiceThreadPoolSize, runnable -> {
+            Thread thread = new Thread(runnable);
+            thread.setName("eventServiceThreadPool");
             return thread;
         });
     }

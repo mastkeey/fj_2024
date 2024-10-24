@@ -26,6 +26,9 @@ resilience4j:
 app:
   threadpool:
     size: 2
+  event-service:
+    threadpool:
+      size: 2
   scheduled:
     threadpool:
       size: 2
