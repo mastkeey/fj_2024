@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - include:
+      file: migrations/changelog/place.sql
+  - include:
+      file: migrations/changelog/event.sql
+
+
+

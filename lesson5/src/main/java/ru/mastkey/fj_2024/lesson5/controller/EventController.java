@@ -1,33 +1,46 @@
 package ru.mastkey.fj_2024.lesson5.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
-import ru.mastkey.fj_2024.lesson5.client.dto.KudaGoEventsResponse;
-import ru.mastkey.fj_2024.lesson5.service.ReactiveEventService;
+import org.springframework.web.bind.annotation.*;
+import ru.mastkey.fj_2024.lesson5.controller.dto.EventRequest;
+import ru.mastkey.fj_2024.lesson5.controller.dto.EventResponse;
+import ru.mastkey.fj_2024.lesson5.service.EventService;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/events")
 @RequiredArgsConstructor
+@RequestMapping("/events")
 public class EventController {
 
-    private final ReactiveEventService eventService;
+    private final EventService eventService;
 
     @GetMapping
-    public ResponseEntity<Mono<List<KudaGoEventsResponse>>> getEvents(
-            @RequestParam("budget") Double budget,
-            @RequestParam("currency") String currency,
-            @RequestParam(value = "dateFrom", required = false) LocalDate dateFrom,
-            @RequestParam(value = "dateTo", required = false) LocalDate dateTo) {
+    public ResponseEntity<List<EventResponse>> getAllEvents(@RequestParam(value = "filtering", required = false) String filtering) {
+        return ResponseEntity.ok(eventService.getAllEvents(filtering));
+    }
 
-        return ResponseEntity.ok(eventService.getEventsByBudget(budget, currency, dateFrom, dateTo));
+    @GetMapping ("/{id}")
+    ResponseEntity<EventResponse> getEventById(@PathVariable UUID id) {
+        return ResponseEntity.ok(eventService.getEventById(id));
+    }
+
+    @PostMapping
+    ResponseEntity<EventResponse> createEvent(@Valid @RequestBody EventRequest request) {
+        return ResponseEntity.ok(eventService.createEvent(request));
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> deleteEventById(@PathVariable UUID id) {
+        eventService.deleteEventById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    ResponseEntity<EventResponse> updateEventById(@PathVariable UUID id, @Valid @RequestBody EventRequest event) {
+        return ResponseEntity.ok(eventService.updateEvent(id, event));
     }
 }
