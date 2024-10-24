@@ -1,4 +1,4 @@
-package ru.mastkey.fj_2024.lesson5.controller.category;
+package ru.mastkey.fj_2024.lesson5.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,6 @@ import ru.mastkey.fj_2024.lesson5.entity.Category;
 import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 import ru.mastkey.fj_2024.lesson5.mapper.CategoryRequestToCategoryMapper;
 import ru.mastkey.fj_2024.lesson5.repository.EntityRepository;
-import ru.mastkey.fj_2024.lesson5.service.CategoryService;
 
 import java.util.Optional;
 import java.util.UUID;

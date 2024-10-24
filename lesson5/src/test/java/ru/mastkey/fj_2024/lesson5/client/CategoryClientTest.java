@@ -20,6 +20,10 @@ import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +45,9 @@ public class CategoryClientTest {
     @Mock
     private HttpEntity entity;
 
+    @Mock
+    private Semaphore rateLimiter;
+
     @InjectMocks
     private CategoryClient categoryClient;
 
@@ -49,6 +56,7 @@ public class CategoryClientTest {
         entityUtilsMockedStatic = mockStatic(EntityUtils.class);
         MockitoAnnotations.openMocks(this);
         categoryClient.BASE_URL = "http://example.com/api/locations";
+        categoryClient.rateLimiter = rateLimiter;
     }
 
     @Test
@@ -84,6 +92,60 @@ public class CategoryClientTest {
         });
 
         assertEquals(ErrorType.INTERNAL_SERVER_ERROR.getCode(), exception.getCode());
+    }
+
+    @Test
+    void getAllEntitiesFromKudaGo_ShouldRespectRateLimitWithMultipleThreads() throws Exception {
+        String jsonResponse = "[{\"name\": \"test location 1\", \"slug\": \"test slug 1\"}, " +
+                "{\"name\": \"test location 2\", \"slug\": \"test slug 2\"}]";
+
+        List<KudaGoCategoryResponse> mockResponse = List.of(
+                new KudaGoCategoryResponse("Test location 1", "test slug 1"),
+                new KudaGoCategoryResponse("Test location 2", "test slug 2")
+        );
+
+        Semaphore semaphoreSpy = spy(new Semaphore(2)); // Лимит на 2 одновременных запроса
+        categoryClient.rateLimiter = semaphoreSpy;
+
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+        when(httpResponse.getEntity()).thenReturn(entity);
+        entityUtilsMockedStatic.when(() -> EntityUtils.toString(entity, "UTF-8")).thenReturn(jsonResponse);
+        when(objectMapper.readValue(eq(jsonResponse), any(TypeReference.class))).thenReturn(mockResponse);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        for (int i = 0; i < 4; i++) {
+            executorService.submit(() -> {
+                try {
+                    categoryClient.getAllEntitiesFromKudaGo();
+                } catch (ServiceException e) {
+                    fail("Unexpected exception: " + e.getMessage());
+                }
+            });
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(10, TimeUnit.SECONDS);
+
+        verify(httpClient, times(4)).execute(any(HttpGet.class));
+        verify(semaphoreSpy, times(4)).acquire();
+        verify(semaphoreSpy, times(4)).release();
+    }
+
+    @Test
+    void getAllEntitiesFromKudaGo_ShouldThrowServiceException_WhenRateLimiterIsExhausted() throws Exception {
+        doThrow(new InterruptedException("Rate limiter exhausted")).when(rateLimiter).acquire();
+
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            categoryClient.getAllEntitiesFromKudaGo();
+        });
+
+        assertEquals(ErrorType.INTERNAL_SERVER_ERROR.getCode(), exception.getCode());
+
+        verify(rateLimiter, times(1)).acquire();
+        verify(rateLimiter, times(0)).release();
     }
 
     @AfterEach
