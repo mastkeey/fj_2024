@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import ru.mastkey.fj_2024.lesson5.command.InitCommand;
 import ru.mastkey.fj_2024.lesson5.exception.ErrorType;
 import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 
@@ -23,8 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class InitializationService {
-    private final CategoryService categoryService;
-    private final LocationService locationService;
+    private final List<InitCommand> initCommands;
 
     @Qualifier("scheduledThreadPool")
     private final ScheduledExecutorService scheduledThreadPool;
@@ -47,9 +47,7 @@ public class InitializationService {
 
         List<Future<Void>> futures = new ArrayList<>();
 
-        futures.add(categoryService.init());
-
-        futures.add(locationService.init());
+        initCommands.forEach(command -> futures.add(command.execute()));
 
         for (Future<Void> future : futures) {
             try {

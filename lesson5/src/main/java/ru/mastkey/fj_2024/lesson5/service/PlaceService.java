@@ -1,15 +1,18 @@
 package ru.mastkey.fj_2024.lesson5.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mastkey.fj_2024.lesson5.controller.dto.PlaceRequest;
 import ru.mastkey.fj_2024.lesson5.controller.dto.PlaceResponse;
 import ru.mastkey.fj_2024.lesson5.entity.Place;
+import ru.mastkey.fj_2024.lesson5.memento.PlaceSpanshotService;
+import ru.mastkey.fj_2024.lesson5.observer.SaveEntityEvent;
+import ru.mastkey.fj_2024.lesson5.observer.SaveEntityEventType;
 import ru.mastkey.fj_2024.lesson5.exception.ErrorType;
 import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
-import ru.mastkey.fj_2024.lesson5.mapper.EventRequestToEventMapper;
 import ru.mastkey.fj_2024.lesson5.mapper.PlaceRequestToPlaceMapper;
 import ru.mastkey.fj_2024.lesson5.repository.PlaceRepository;
 
@@ -25,6 +28,8 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final ConversionService conversionService;
     private final PlaceRequestToPlaceMapper placeRequestToPlaceMapper;
+    private final ApplicationEventPublisher eventPublisher;
+    private final PlaceSpanshotService placeSpanshotService;
 
     @Transactional(readOnly = true)
     public PlaceResponse getPlaceById(UUID id) {
@@ -48,7 +53,13 @@ public class PlaceService {
 
         var place = conversionService.convert(placeRequest, Place.class);
 
-        return conversionService.convert(placeRepository.save(place), PlaceResponse.class);
+
+        eventPublisher.publishEvent(new SaveEntityEvent<Place>(this, place, SaveEntityEventType.CREATED));
+
+        var savedPlace = placeRepository.save(place);
+        placeSpanshotService.saveSnapshot(savedPlace);
+
+        return conversionService.convert(savedPlace, PlaceResponse.class);
     }
 
     @Transactional
@@ -56,6 +67,9 @@ public class PlaceService {
         var place = validateAndGetPlace(id);
 
         var placeToSave = placeRequestToPlaceMapper.toPlaceForUpdate(place, placeRequest);
+
+        placeSpanshotService.saveSnapshot(place);
+        eventPublisher.publishEvent(new SaveEntityEvent<Place>(this, place, SaveEntityEventType.UPDATED));
 
         return conversionService.convert(placeRepository.save(placeToSave), PlaceResponse.class);
     }
