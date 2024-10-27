@@ -3,6 +3,7 @@ package ru.mastkey.fj_2024.lesson5.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 import ru.mastkey.fj_2024.lesson5.client.CBClient;
 import ru.mastkey.fj_2024.lesson5.client.dto.CBCurrencyResponse;
 import ru.mastkey.fj_2024.lesson5.controller.dto.ConvertCurrencyRequest;
@@ -62,6 +63,10 @@ public class CurrencyService {
         var convertedAmount = convert(request.getAmount(), fromCurrency, toCurrency);
 
         return createConvertCurrencyResponse(request, convertedAmount);
+    }
+
+    public Mono<ConvertCurrencyResponse> convertCurrencyMono(ConvertCurrencyRequest request) {
+        return Mono.just(convertCurrency(request));
     }
 
     private void validateConvertRequest(ConvertCurrencyRequest request) {
