@@ -51,3 +51,6 @@ app:
     schedule: "PT10M"
   rate-limit:
     max-concurrent-requests: 5
+  jwt:
+    secret-key: "SADADASfAFADFADFSDFASDASDadaADkamaksmdaKDaDsa"
+    ttl-in-min: 10

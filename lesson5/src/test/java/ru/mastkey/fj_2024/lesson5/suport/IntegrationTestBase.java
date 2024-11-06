@@ -20,6 +20,7 @@ import ru.mastkey.fj_2024.lesson5.entity.Place;
 import ru.mastkey.fj_2024.lesson5.repository.EntityRepository;
 import ru.mastkey.fj_2024.lesson5.repository.EventRepository;
 import ru.mastkey.fj_2024.lesson5.repository.PlaceRepository;
+import ru.mastkey.fj_2024.lesson5.repository.UserRepository;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -68,6 +69,9 @@ public class IntegrationTestBase {
 
     @Autowired
     protected EventRepository eventRepository;
+
+    @Autowired
+    protected UserRepository userRepository;
 
     protected Place createPlaceWithEvent() {
         var place = new Place();
