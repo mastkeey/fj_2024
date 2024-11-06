@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class CustomLinkedList<E> implements Iterable<E> {
     private final Node<E> head;
@@ -39,12 +40,12 @@ public class CustomLinkedList<E> implements Iterable<E> {
 
     public boolean contains(E e) {
         var temp = head.next;
-            while (temp != tail) {
-                if (Objects.equals(temp.item, e)) {
-                    return true;
-                }
-                temp = temp.next;
+        while (temp != tail) {
+            if (Objects.equals(temp.item, e)) {
+                return true;
             }
+            temp = temp.next;
+        }
         return false;
     }
 
@@ -114,6 +115,13 @@ public class CustomLinkedList<E> implements Iterable<E> {
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Remove not supported");
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            while (hasNext()) {
+                action.accept(next());
+            }
         }
     }
 

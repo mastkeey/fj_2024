@@ -1,6 +1,7 @@
 package ru.mastkey.fj_2024.lesson5.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +9,9 @@ import ru.mastkey.fj_2024.lesson5.controller.dto.EventRequest;
 import ru.mastkey.fj_2024.lesson5.controller.dto.EventResponse;
 import ru.mastkey.fj_2024.lesson5.entity.Event;
 import ru.mastkey.fj_2024.lesson5.entity.Place;
+import ru.mastkey.fj_2024.lesson5.memento.EventSnapshotService;
+import ru.mastkey.fj_2024.lesson5.observer.SaveEntityEvent;
+import ru.mastkey.fj_2024.lesson5.observer.SaveEntityEventType;
 import ru.mastkey.fj_2024.lesson5.exception.ErrorType;
 import ru.mastkey.fj_2024.lesson5.exception.ServiceException;
 import ru.mastkey.fj_2024.lesson5.mapper.EventRequestToEventMapper;
@@ -29,6 +33,8 @@ public class EventService {
     private final PlaceRepository placeRepository;
     private final ConversionService conversionService;
     private final EventRequestToEventMapper eventRequestToEventMapper;
+    private final ApplicationEventPublisher eventPublisher;
+    private final EventSnapshotService eventSnapshotService;
 
     @Transactional
     public EventResponse createEvent(EventRequest request) {
@@ -37,7 +43,11 @@ public class EventService {
         var event = conversionService.convert(request, Event.class);
         event.setPlace(place);
 
-        return conversionService.convert(eventRepository.save(event), EventResponse.class);
+        eventPublisher.publishEvent(new SaveEntityEvent<Event>(this, event, SaveEntityEventType.CREATED));
+        var savedEvent = eventRepository.save(event);
+        eventSnapshotService.saveSnapshot(savedEvent);
+
+        return conversionService.convert(savedEvent, EventResponse.class);
     }
 
     @Transactional(readOnly = true)
@@ -71,6 +81,10 @@ public class EventService {
 
         var updatedEvent = eventRequestToEventMapper.toEventForUpdate(event, eventRequest);
         updatedEvent.setPlace(place);
+
+        eventSnapshotService.saveSnapshot(event);
+        eventPublisher.publishEvent(new SaveEntityEvent<Event>(this, event, SaveEntityEventType.UPDATED));
+
         return conversionService.convert(eventRepository.save(updatedEvent), EventResponse.class);
     }
 
