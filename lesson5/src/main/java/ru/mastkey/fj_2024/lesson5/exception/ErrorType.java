@@ -11,6 +11,8 @@ public enum ErrorType {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "InternalServerError"),
     NOT_FOUND(HttpStatus.NOT_FOUND.value(), "NotFound"),
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE.value(), "ServiceUnavailable"),
+    FORBIDDEN(HttpStatus.FORBIDDEN.value(), "Forbidden"),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED.value(), "Unauthorized"),
     CONFLICT(HttpStatus.CONFLICT.value(), "Conflict");
 
     private final int status;

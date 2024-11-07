@@ -7,6 +7,16 @@ databaseChangeLog:
       file: migrations/changelog/event-snapshot.sql
   - include:
       file: migrations/changelog/place-snapshot.sql
+  - include:
+      file: migrations/changelog/user.sql
+  - include:
+      file: migrations/changelog/role.sql
+  - include:
+      file: migrations/changelog/user-roles.sql
+  - include:
+      file: migrations/changelog/roles-data.sql
+  - include:
+      file: migrations/changelog/admin-data.sql
 
 
 
