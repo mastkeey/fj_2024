@@ -3,6 +3,15 @@ plugins {
     id 'org.springframework.boot' version '3.0.0'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'jacoco'
+    id 'org.sonarqube' version '4.0.0.2929'
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "mastkeey_fj_2024"
+        property "sonar.organization", "mastkeey"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }
 
 java {
@@ -53,6 +62,8 @@ dependencies {
     testImplementation 'org.wiremock.integrations.testcontainers:wiremock-testcontainers-module:1.0-alpha-13'
 
     testImplementation 'org.mockito:mockito-core:5.5.0'
+//    testImplementation 'org.wiremock:wiremock:3.9.1'
+    testImplementation 'com.github.tomakehurst:wiremock:3.0.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.jeasy:easy-random-core:5.0.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -74,6 +85,7 @@ jacocoTestReport {
     dependsOn test
     reports {
         html.required.set(true)
+        xml.required.set(true)
     }
 }
 

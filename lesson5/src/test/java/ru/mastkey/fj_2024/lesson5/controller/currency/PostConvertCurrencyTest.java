@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import ru.mastkey.fj_2024.lesson5.controller.dto.ConvertCurrencyRequest;
 import ru.mastkey.fj_2024.lesson5.controller.dto.ConvertCurrencyResponse;
 import ru.mastkey.fj_2024.lesson5.exception.response.ErrorResponse;
-import ru.mastkey.fj_2024.lesson5.suport.IntegrationTestBase;
+import ru.mastkey.fj_2024.lesson5.support.IntegrationTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

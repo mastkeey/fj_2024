@@ -6,7 +6,7 @@ import ru.mastkey.fj_2024.lesson5.controller.dto.PlaceRequest;
 import ru.mastkey.fj_2024.lesson5.controller.dto.PlaceResponse;
 import ru.mastkey.fj_2024.lesson5.entity.Place;
 import ru.mastkey.fj_2024.lesson5.exception.response.ErrorResponse;
-import ru.mastkey.fj_2024.lesson5.suport.IntegrationTestBase;
+import ru.mastkey.fj_2024.lesson5.support.IntegrationTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

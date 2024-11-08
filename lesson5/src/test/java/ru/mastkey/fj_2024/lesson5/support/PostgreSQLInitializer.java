@@ -1,4 +1,4 @@
-package ru.mastkey.fj_2024.lesson5.suport;
+package ru.mastkey.fj_2024.lesson5.support;
 
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
