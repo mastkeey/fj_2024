@@ -25,11 +25,11 @@ jobs:
 
       - name: Build with Gradle
         working-directory: lesson5
-        run: ../gradlew clean build -x test
+        run: ./gradlew clean build -x test
 
       - name: Run tests with coverage
         working-directory: lesson5
-        run: ../gradlew test jacocoTestReport
+        run: ./gradlew test jacocoTestReport
 
       - name: Upload test coverage report
         uses: actions/upload-artifact@v3
