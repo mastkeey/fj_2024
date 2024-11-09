@@ -32,4 +32,4 @@ jobs:
           -Dsonar.projectKey=mastkeey_fj_2024 \
           -Dsonar.organization=mastkeey \
           -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.coverage.jacoco.xmlReportPaths=./build/reports/jacoco/test/html/jacocoTestReport.xml
+          -Dsonar.coverage.jacoco.xmlReportPaths=lesson5/build/reports/jacoco/test/html/jacocoTestReport.xml
