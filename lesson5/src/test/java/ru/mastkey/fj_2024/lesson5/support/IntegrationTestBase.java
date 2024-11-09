@@ -1,18 +1,12 @@
-package ru.mastkey.fj_2024.lesson5.suport;
+package ru.mastkey.fj_2024.lesson5.support;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.jeasy.random.EasyRandom;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.mastkey.fj_2024.lesson5.entity.Category;
@@ -30,7 +24,7 @@ import java.util.UUID;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
-@ContextConfiguration(initializers = {PostgreSQLInitializer.class, WiremockInitializer.class})
+@ContextConfiguration(initializers = {PostgreSQLInitializer.class, WireMockInitializer.class})
 public class IntegrationTestBase {
 
     protected static final EasyRandom easyRandom = new EasyRandom();

@@ -3,7 +3,7 @@ package ru.mastkey.fj_2024.lesson5.controller.event;
 import org.junit.jupiter.api.Test;
 import ru.mastkey.fj_2024.lesson5.controller.dto.EventResponse;
 import ru.mastkey.fj_2024.lesson5.entity.Event;
-import ru.mastkey.fj_2024.lesson5.suport.IntegrationTestBase;
+import ru.mastkey.fj_2024.lesson5.support.IntegrationTestBase;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

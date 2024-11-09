@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.mastkey.fj_2024.lesson5.controller.dto.LocationRequest;
 import ru.mastkey.fj_2024.lesson5.controller.dto.LocationResponse;
 import ru.mastkey.fj_2024.lesson5.entity.Location;
-import ru.mastkey.fj_2024.lesson5.suport.IntegrationTestBase;
+import ru.mastkey.fj_2024.lesson5.support.IntegrationTestBase;
 
 import java.util.List;
 import java.util.UUID;

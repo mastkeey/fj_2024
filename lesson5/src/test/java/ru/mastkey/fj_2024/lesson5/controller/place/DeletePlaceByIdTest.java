@@ -1,9 +1,8 @@
 package ru.mastkey.fj_2024.lesson5.controller.place;
 
 import org.junit.jupiter.api.Test;
-import ru.mastkey.fj_2024.lesson5.entity.Place;
 import ru.mastkey.fj_2024.lesson5.exception.response.ErrorResponse;
-import ru.mastkey.fj_2024.lesson5.suport.IntegrationTestBase;
+import ru.mastkey.fj_2024.lesson5.support.IntegrationTestBase;
 
 import java.util.UUID;
 
