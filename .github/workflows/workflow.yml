@@ -27,6 +27,9 @@ jobs:
         working-directory: lesson5
         run: ./gradlew clean build -x test
 
+      - name: List build directory contents
+        run: ls -R lesson5/build/
+
       - name: Run tests with coverage
         working-directory: lesson5
         run: ./gradlew test jacocoTestReport
