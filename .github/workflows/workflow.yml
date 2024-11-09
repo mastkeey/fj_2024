@@ -52,16 +52,16 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      # - name: Run SonarCloud analysis
-      #   working-directory: lesson5
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #   run: |
-      #     ../gradlew sonarqube \
-      #       -Dsonar.projectKey=my_project_key \
-      #       -Dsonar.organization=my_organization \
-      #       -Dsonar.host.url=https://sonarcloud.io
+      - name: Run SonarCloud analysis
+        working-directory: lesson5
+        env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ../gradlew sonarqube \
+           -Dsonar.projectKey=mastkeey_fj_2024 \
+           -Dsonar.organization=mastkeey \
+           -Dsonar.host.url=https://sonarcloud.io
 
   publish:
     name: Publish Docker Image
