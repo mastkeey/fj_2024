@@ -56,12 +56,6 @@ jobs:
         working-directory: lesson5
         run: ./gradlew clean build -x test
 
-      - name: Set global environment variables
-        id: global_env
-        run: |
-          echo "::set-output name=IMAGE_NAME::${GITHUB_REPOSITORY#*/}"
-          echo "::set-output name=DOCKER_IMAGE_NAME::ghcr.io/${GITHUB_REPOSITORY}/${GITHUB_REPOSITORY#*/}"
-
       - name: Log in to GitHub Docker registry
         run: echo "${{ secrets.FJ }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
@@ -74,11 +68,7 @@ jobs:
 
       - name: Build and tag Docker image
         run: |
-          docker build -t "${{ steps.global_env.outputs.DOCKER_IMAGE_NAME }}:latest" \
-                       -t "${{ steps.global_env.outputs.DOCKER_IMAGE_NAME }}:${GITHUB_SHA::8}" \
-                       -f lesson5/Dockerfile .
+          docker build -t ghcr.io/mastkeey/fintech:latest -f lesson5/Dockerfile .
 
       - name: Push Docker image to GitHub Packages
-        run: |
-          docker push "${{ steps.global_env.outputs.DOCKER_IMAGE_NAME }}:latest"
-          docker push "${{ steps.global_env.outputs.DOCKER_IMAGE_NAME }}:${GITHUB_SHA::8}"
+        run: docker push ghcr.io/mastkeey/fintech:latest
