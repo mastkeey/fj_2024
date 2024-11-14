@@ -71,7 +71,8 @@ jobs:
           fi
 
       - name: Build and tag Docker image
-        run: docker build -t ghcr.io/mastkeey/fintech:latest .
+        run: |
+          docker build -t ghcr.io/mastkeey/fintech:latest -f lesson5/Dockerfile .
 
       - name: Push Docker image to GitHub Packages
         run: docker push ghcr.io/mastkeey/fintech:latest
