@@ -61,7 +61,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.FJ }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check if JAR file exists
         run: |
