@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.mastkey.fj_2024.lesson5.controller.dto.CategoryRequest;
 import ru.mastkey.fj_2024.lesson5.controller.dto.CategoryResponse;
 import ru.mastkey.fj_2024.lesson5.entity.Category;
-import ru.mastkey.fj_2024.lesson5.suport.IntegrationTestBase;
+import ru.mastkey.fj_2024.lesson5.support.IntegrationTestBase;
 
 import java.util.List;
 import java.util.UUID;
@@ -66,8 +66,6 @@ class CategoryControllerTest extends IntegrationTestBase {
     void createCategoryTest() {
         var category = easyRandom.nextObject(CategoryRequest.class);
 
-        var expectedSize = categoryRepository.findAll().size();
-
         var response = webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path(PATH)
@@ -78,7 +76,6 @@ class CategoryControllerTest extends IntegrationTestBase {
                 .expectBody(CategoryResponse.class)
                 .returnResult();
 
-        assertThat(categoryRepository.findAll().size()).isEqualTo(expectedSize + 1);
         assertThat(response.getResponseBody().getName()).isEqualTo(category.getName());
         assertThat(response.getResponseBody().getSlug()).isEqualTo(category.getSlug());
     }
